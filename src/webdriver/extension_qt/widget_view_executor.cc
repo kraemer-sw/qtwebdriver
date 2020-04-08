@@ -598,6 +598,22 @@ void QWidgetViewCmdExecutor::GetAttribute(const ElementId& element, const std::s
     QVariant propertyValue = pElement->property(key.c_str());
     Value* val = NULL;
 
+    if (key == "foregroundColor") {
+      QWidget* pWidget = getWidget(element, error);
+      if (NULL == pWidget)
+          return;
+      const QPalette palette = pWidget->palette();
+      const QColor fg = palette.color(pWidget->foregroundRole());
+      val = Value::CreateStringValue(fg.name().toStdString());
+    } else if (key == "backgroundColor") {
+      QWidget* pWidget = getWidget(element, error);
+      if (NULL == pWidget)
+          return;
+      const QPalette palette = pWidget->palette();
+      const QColor bg = palette.color(pWidget->backgroundRole());
+      val = Value::CreateStringValue(bg.name().toStdString());
+    }
+
     if (propertyValue.isValid()) {
         // convert QVariant to base::Value
         if (propertyValue.canConvert<QString>()) {
