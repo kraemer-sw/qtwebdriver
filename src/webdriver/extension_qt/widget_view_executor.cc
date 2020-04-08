@@ -89,6 +89,7 @@
 #include <QtGui/QGraphicsSimpleTextItem>
 #include <QtGui/QGraphicsTextItem>
 #endif
+#include <QtGui/QStandardItemModel>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -613,6 +614,25 @@ void QWidgetViewCmdExecutor::GetAttribute(const ElementId& element, const std::s
       const QColor bg = palette.color(pWidget->backgroundRole());
       val = Value::CreateStringValue(bg.name().toStdString());
     }
+
+    if (key == "items") {
+        QWidget* pWidget = getWidget(element, error);
+        if (NULL == pWidget)
+            return;
+
+        QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
+        if (NULL != comboBox) {
+            QString items;
+            const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(comboBox->model());
+            for (int i = 0; i < model->rowCount(); ++i) {
+                QStandardItem* item = model->item(i);
+                items.append(item->text() + "\n");
+                QString itemText = item->text();
+                printf("%s: %d,  [%s]\n", __FILE__, __LINE__, itemText.toStdString().c_str());
+              }
+            val = Value::CreateStringValue(items.toStdString());
+        }
+      }
 
     if (propertyValue.isValid()) {
         // convert QVariant to base::Value
