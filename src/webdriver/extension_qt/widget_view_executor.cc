@@ -199,6 +199,19 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
         return;
     }
 
+    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
+    if (NULL != comboBox) {
+        std::stringstream ss;
+        ss << keys;
+        std::string item_string = ss.str();
+        QString item = QString::fromUtf8(item_string.c_str());
+        int index = comboBox->findData(item, Qt::DisplayRole);
+        comboBox->setCurrentIndex(index);
+        comboBox->activated(item);
+        session_->logger().Log(kInfoLogLevel, "ComboBox item '" + item_string + "' found at position " + std::to_string(index));
+        return;
+    }
+
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
     int modifiers = Qt::NoModifier;
